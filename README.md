@@ -13,7 +13,7 @@ Therefore other methods can be used to quantify and identify transcript-level di
 
 So, Here I will describe the pipeline we used for transcript quantification and transcript-level differential analysis.  
 
-* [kallisto](https://github.com/ziul-bio/transcriptome_analysis/blob/main/2.1_kallisto_sleuth.md)-[sleuth](https://github.com/ziul-bio/transcriptome_analysis/blob/main/2.2_sleuth.md)  
+* [kallisto](https://github.com/ziul-bio/lncov1_Transcriptome_Analysis/blob/main/1.0_transcriptomeAnalysis_kallisto_pipeline.md)-[sleuth](https://github.com/ziul-bio/lncov1_Transcriptome_Analysis/blob/main/2.2_sleuth.md)  
 
 Kallisto is a method for quantification on the transcript (isoform) level, rather than the gene level. Kallisto quantifies a set of FASTA sequences, like a transcript representative genome. Thus it does not perform transcript assembly and it cannot quantify the expression of novel transcripts.  
 
