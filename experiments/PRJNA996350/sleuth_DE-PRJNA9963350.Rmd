@@ -111,7 +111,6 @@ Create a dataframe containing metadata and locations of the estimated counts fil
 
 Create metadata associated with the kallisto files as in the DESeq2 using the data.frame().
 ```{r}
-
 base_dir <- "kallisto/quant"
 
 sample_id <- dir(file.path(base_dir))
@@ -119,9 +118,8 @@ sample_id <- dir(file.path(base_dir))
 
 # Sleuth requires a column entitled “sample” containing the sample names:
 metadata <- data.frame(sample = sample_id,
-                          condition = factor(c(rep("AW", 2),
-                                               rep("Q", 2),
-                                               rep("W", 2))))
+                          condition = factor(c(rep("Con", 3),
+                                               rep("RNAi", 3))))
 ```
 
 
@@ -163,14 +161,14 @@ metadata
 
 NOTE: Sleuth will automatically use the first level (alphabetically by default) in the factor variable being 
 tested to compare all other conditions against (in the metadata, this is ‘AW’, but in other cases like: 
-control vs treated, control will be used as first level). 
+control vs treated, coltrol will be used as first level). 
 
 If you want to use a different condition to be the base level, then you would need to use the relevel() function
 to change the base level of the variable.
 
 For example, if we wanted the base level of condition to be “W”, we could use the following code:
 ```{r}
-metadata$condition <- relevel(metadata$condition, ref = "W")
+metadata$condition <- relevel(metadata$condition, ref = "Con")
 ```
 
 
@@ -235,20 +233,12 @@ At this step in the workflow, we need to specify which level we want to compare 
 
 # Wald test for differential expression of isoforms
 ```{r}
-DE_AW <- sleuth_wt(so, which_beta = 'conditionAW')
-
-
-DE_Q <- sleuth_wt(so, which_beta = 'conditionQ')
-
+DE_RNAi <- sleuth_wt(so, which_beta = 'conditionRNAi')
 
 
 # Get results
-sleuth_results_AW <- sleuth_results(DE_AW, 
-                                    test = 'conditionAW', 
-                                    show_all = TRUE)
-
-sleuth_results_Q <- sleuth_results(DE_Q, 
-                                    test = 'conditionQ', 
+sleuth_results_RNAi <- sleuth_results(DE_RNAi, 
+                                    test = 'conditionRNAi', 
                                     show_all = TRUE)
 ```
 NOTE: The output represents the results from the differential expression testing with the following columns:
@@ -297,10 +287,9 @@ txI <- c("XM_001120691.5", "XM_624635.6", "lncov1", "XM_006569892.2")
 
 ## 1. Get Differencial expressed transcripts results table
 ```{r}
-sleuth_sig_AW <- dplyr::filter(sleuth_results_AW, pval <= 0.05)
-sleuth_sig_Q <- dplyr::filter(sleuth_results_Q, pval <= 0.05)
+sleuth_sig_RNAi <- dplyr::filter(sleuth_results_RNAi, pval <= 0.05)
 
-head(sleuth_sig_AW)
+head(sleuth_sig_RNAi)
 ```
 
 ## 1.2 Get bootstrap summary
@@ -333,20 +322,20 @@ volcano plot, Plots of beta value (regression) versus log of significance p-valu
 
 ## Volcano plot Queen vs Worker
 ```{r, , fig.height=5, fig.width=9}
-q <- as.data.frame(sleuth_results_Q)
-q <- na.omit(q)
-q$significant <- ifelse(q$qval<0.05, "True", "False")
-q[which(abs(q$b)<0.5),'significant'] <- "False"
-q <- q[order(q$pval),]
+dt <- as.data.frame(sleuth_results_RNAi)
+dt <- na.omit(dt)
+dt$significant <- ifelse(dt$qval<0.05, "True", "False")
+dt[which(abs(dt$b)<0.5),'significant'] <- "False"
+dt <- dt[order(dt$pval),]
 
 
-legen <- q[q$target_id %in% txI, ]
+legen <- dt[dt$target_id %in% txI, ]
 legen$target_id <- recode(legen$target_id, XM_001120691.5 = "LOC726407",
                           #XM_393605.7 = "Gapdh", 
                           XM_624635.6 = "Tudor-SN",
                           XM_006569892.2 = "Ef1α")
 
-volcano = ggplot(q, aes(b, -log10(qval))) + 
+volcano = ggplot(dt, aes(b, -log10(qval))) + 
   geom_point(aes(col=significant)) +
   scale_color_manual(values=c("red", "gray"))
 
@@ -354,50 +343,19 @@ volcano = ggplot(q, aes(b, -log10(qval))) +
 volcano + geom_label_repel(data= legen, aes(label= legen$target_id), size=4, fontface = "italic",
   box.padding = unit(2, "lines"), point.padding = unit(5, "points")) +
   labs(title= "Volcano plot of Diferencial Expressed Transcripts",
-       subtitle = "Comparison of Queen vs Worker",
+       subtitle = "Comparison of RNAi x Control",
        x= expression(paste("Log"[2], " fold change")), 
        y= expression(paste("q-value (-log"[10], ")")),
        color="Differentially Expressed") +
   theme_bw() + coord_cartesian(clip = "off")
-ggsave(file="results/volcano1_queen.jpeg", height=5, width=9, dpi=300)
+ggsave(file="results/volcano_rnai_x_con.jpeg", height=5, width=9, dpi=300)
 ```
 
-
-## Volcano plot Queenless-worker vs Worker
-```{r, fig.height=5, fig.width=9}
-q <- as.data.frame(sleuth_results_AW)
-q <- na.omit(q)
-q$significant <- ifelse(q$qval<0.05, "True", "False")
-q[which(abs(q$b)<0.5),'significant'] <- "False"
-q <- q[order(q$pval),]
-
-
-legen <- q[q$target_id %in% txI, ]
-legen$target_id <- recode(legen$target_id, XM_001120691.5 = "LOC726407", 
-                          #XM_393605.7 = "Gapdh", 
-                          XM_624635.6 = "Tudor-SN",
-                          XM_006569892.2 = "Ef1α" )
-
-volcano = ggplot(q, aes(b, -log10(qval))) + 
-  geom_point(aes(col=significant)) +
-  scale_color_manual(values=c("red", "gray"))
-
-
-volcano + geom_label_repel(data= legen, aes(label= legen$target_id), size=4, fontface = "italic",
-  box.padding = unit(2, "lines"), point.padding = unit(5, "points")) +
-  labs(title= "Volcano plot of Diferencial Expressed Transcipts",
-       subtitle = "Comparison of Queenless-Worker vs Worker",
-       x= expression(paste("Log"[2], " fold change")), 
-       y= expression(paste("q-value (-log"[10], ")")),
-       color="Differentially Expressed") +
-  theme_bw() + coord_cartesian(clip = "off")
-ggsave(file="results/volcano2_queenless.jpeg", height=5, width=9, dpi=300)
-```
 
 
 ## 3. PCA
 ```{r, fig.height=5, fig.width=9}
-#png("pca-transcritos.png",height = 8, width = 10, units = 'in',res=600)
+#png("results/pca-transcritos.png",height = 8, width = 10, units = 'in',res=600)
 
 plot_pca(so, pc_x = 1L, pc_y = 2L, use_filtered = TRUE,
   units = "est_counts", text_labels = F, color_by = "condition",
@@ -442,18 +400,34 @@ This is the box plot showing the middle 50% of scores (i.e., the range between t
 
 Transcript lncov1
 ```{r}
-names_facet <- c(W = "Queenright Workers", AW = "Queenless Workers", Q = "Queen")
+names_facet <- c(Con = "Control", RNAi = "RNAi")
 
 plot1 <- plot_bootstrap(so, "lncov1", units = "est_counts", color_by = "condition") +
 
 ggtitle("lncov1") + theme_bw() + 
   theme(legend.position="none", plot.title = element_text(size = 14, face="italic")) +
   ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
-  facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', repeat.tick.labels = "All", strip.position="bottom") + scale_fill_manual(values=c("#7f7efd", "#fd8183", "#74C476"))
+  facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', repeat.tick.labels = "All", strip.position="bottom") + scale_fill_manual(values=c( "#fd8183", "#74C476"))
 
 plot1
 ggsave(file="results/boxplot1_lncov1.jpeg", height=5, width=9, dpi=300)
 ```
+
+
+# kruppel NM_001242470.1
+```{r}
+plot1.1 <- plot_bootstrap(so, "NM_001242470.1", units = "est_counts", color_by = "condition") +
+
+ggtitle("kruppel") + theme_bw() + 
+  theme(legend.position="none", plot.title = element_text(size = 14, face="italic")) +
+  ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
+  facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', repeat.tick.labels = "All", strip.position="bottom") + scale_fill_manual(values=c( "#fd8183", "#74C476"))
+
+plot1.1
+ggsave(file="results/boxplot1_kruppel.jpeg", height=5, width=9, dpi=300)
+```
+
+
 
 
 Transcript XM_001120691.5 = Loc726407
@@ -463,7 +437,7 @@ plot2 <- plot_bootstrap(so, "XM_001120691.5", units = "est_counts", color_by = "
 ggtitle("LOC726407") + theme_bw() + theme(legend.position="none", plot.title = element_text(size = 14, face="italic")) +
   ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
   facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', repeat.tick.labels = "All", strip.position="bottom") + 
-  scale_fill_manual(values=c("#7f7efd", "#fd8183", "#74C476"))
+  scale_fill_manual(values=c( "#fd8183", "#74C476"))
 
 plot2
 ggsave(file="results/boxplot2_Loc726407.jpeg", height=5, width=9, dpi=300)
@@ -477,10 +451,10 @@ plot3 <- plot_bootstrap(so, "XM_393605.7", units = "est_counts", color_by = "con
 ggtitle("Gapdh") + theme_bw() + theme(legend.position="none", plot.title = element_text(size = 14, face="italic")) +
   ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
   facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', repeat.tick.labels = "All", strip.position="bottom") + 
-  scale_fill_manual(values=c("#7f7efd", "#fd8183", "#74C476"))
+  scale_fill_manual(values=c("#fd8183", "#74C476"))
 
 plot3
-#ggsave(file="results/boxplot3_Gapdh.jpeg", height=5, width=9, dpi=300)
+ggsave(file="results/boxplot3_Gapdh.jpeg", height=5, width=9, dpi=300)
 ```
 
 
@@ -489,9 +463,9 @@ XM_624635.6 para Tudor-SN
 plot4 <- plot_bootstrap(so, "XM_624635.6", units = "est_counts", color_by = "condition") + 
 
 ggtitle("Tudor-SN") + theme_bw() + 
-  ylab(expression("Estimated counts - log"[2])) + ylim(c(10, 10.75)) + xlab("Samples") + 
+  ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
   facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', repeat.tick.labels = "All", strip.position="bottom") + 
-  scale_fill_manual(values=c("#7f7efd", "#fd8183", "#74C476"))
+  scale_fill_manual(values=c("#fd8183", "#74C476"))
 
 plot4
 ggsave(file="results/boxplot4_Tudor-SN.jpeg", height=5, width=9, dpi=300)
@@ -503,12 +477,12 @@ XM_006569892.2 = ef1alfa
 plot5 <- plot_bootstrap(so, "XM_006569892.2", units = "est_counts", color_by = "condition") +
 
 ggtitle("Ef1α") + theme_bw(11) + 
-  theme(legend.position="none", plot.title = element_text(size = 16, face="italic"), 
-        axis.text.x = element_text(angle = 45,  hjust=1)) +
+  theme(legend.position="none", plot.title = element_text(size = 16, face="italic"))+
+        #axis.text.x = element_text(angle = 45,  hjust=1))
   ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
   facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', 
                  repeat.tick.labels = "All", strip.position="bottom", ncol = 5) + 
-  scale_fill_manual(values=c("#7f7efd", "#fd8183", "#74C476"))
+  scale_fill_manual(values=c("#fd8183", "#74C476"))
 
 
 plot5
@@ -521,16 +495,15 @@ rp49 = XM_006564315.3
 plot6 <- plot_bootstrap(so, "XM_006564315.3", units = "est_counts", color_by = "condition") +
 
 ggtitle("rp49") + theme_bw(11) + 
-  theme(legend.position="none", plot.title = element_text(size = 16, face="italic"), 
-        axis.text.x = element_text(angle = 45,  hjust=1)) +
+  theme(legend.position="none", plot.title = element_text(size = 16, face="italic"))+
   ylab(expression("Estimated counts - log"[2])) + xlab("Samples") + 
   facet_rep_wrap(~condition, labeller = as_labeller(names_facet), scales='free_x', 
                  repeat.tick.labels = "All", strip.position="bottom", ncol = 5) + 
-  scale_fill_manual(values=c("#7f7efd", "#fd8183", "#74C476"))
+  scale_fill_manual(values=c("#fd8183", "#74C476"))
 
 
 plot6
-#ggsave(file="results/boxplot4_rp49.jpeg", height=8, width=11, dpi=300)
+ggsave(file="results/boxplot4_Tudor-SN.jpeg", height=8, width=11, dpi=300)
 ```
 
 
@@ -552,9 +525,9 @@ ggsave(file="results/boxplot5_all.jpeg", height=16, width=10, dpi=300)
 we can perform an expression heatmap for select transcripts, transcripts of interest:
 ```{r, fig.height=5, fig.width=9}
 # Filtando a matriz pelos transcritos de interesse
-mat <- sleuth_results_Q[sleuth_results_Q$target_id %in% txI, ]
+mat <- sleuth_results_RNAi[sleuth_results_RNAi$target_id %in% txI, ]
   
-plot_transcript_heatmap(DE_Q, units = "est_counts", transcripts = mat$target_id)
+plot_transcript_heatmap(DE_RNAi, units = "est_counts", transcripts = mat$target_id)
 ```
 
 ## Referências
