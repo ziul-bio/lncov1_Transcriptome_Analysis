@@ -43,7 +43,10 @@ bash run_kallisto_pipeline.sh -experiment GSE120561
 Note: make sure you have Kallisto and curl installed before proceeding. 
 
 
-With the previous code finished, the quantification files will be inside of the experiment ID folder. To run sleuth and reproduce the figures as we did it, just open the Rmd file in Rstudio inside the experiment and run it.
+With the previous code finished, the quantification files will be inside of the experiment ID folder. 
+
+
+To run sleuth and reproduce the figures as we did it, just open the Rmd file in Rstudio inside the experiment and run it.
 
 Make sure to install all the libraries required.
 
