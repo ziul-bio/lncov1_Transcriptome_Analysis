@@ -27,5 +27,18 @@ These bootstrap results are used downstream by sleuth to perform differential ex
 
 * Differencial expression analysis for all transcripts among the different experimental conditions.  
 
+## Quick start
+
+For a easy reproductibility of our work, I created the file [run_kallisto_pipeline.sh](https://github.com/ziul-bio/lncov1_Transcriptome_Analysis/blob/main/scripts/run_kallisto_pipeline.sh), as simple as 1 2 3, just run the code bellow. 
+
+Note: -experiment is the experiment id of one of the studies used in this analysis. With the following code, the data will be downloaded and the quantification with kallisto will be performed. 
+
+>>> git clone git@github.com:ziul-bio/lncov1_Transcriptome_Analysis.git
+>>> bash run_kallisto_pipeline.sh -experiment GSE120561
+
+Note: make sure you have kallisto and curl install before procede. 
+
+
+
 
 ---
