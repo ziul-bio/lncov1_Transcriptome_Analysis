@@ -2,7 +2,7 @@
 set -o errexit
 
 # how to run this script 
-# bash scripts/run_QC.sh -experiment PRJNA996350
+#bash scripts/run_kallisto_pipeline.sh -experiment PRJNA996350
 
 # Define a list of valid experiment IDs
 valid_experiments=("GSE120561" "GSE93028" "PRJNA996350")

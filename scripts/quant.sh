@@ -3,6 +3,9 @@
 # Para terminar a execução do script se algum erro ocorrer
 set -o errexit
 
+# how to run:
+#bash scripts/quant.sh -experiment PRJNA996350
+
 # Define a list of valid experiment IDs
 valid_experiments=("GSE120561" "GSE93028" "PRJNA996350")
 experimentID=$2
@@ -39,10 +42,10 @@ FILE="data/kallisto_index/index_trans"
 
 # Check if the index does not exist
 if [ ! -f "$FILE" ]; then
-    echo "Index file does not exist. Running kallisto index..."
+    echo "Index file does NOT exist. Running kallisto index..."
     kallisto index -i ${KALLISTO_INDEX} data/all_transcrits.fasta
 else
-    echo "File exists."
+    echo "Index file found. Running kallisto index..."
 fi
 
 
