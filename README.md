@@ -29,16 +29,23 @@ These bootstrap results are used downstream by sleuth to perform differential ex
 
 ## Quick start
 
-For a easy reproductibility of our work, I created the file [run_kallisto_pipeline.sh](https://github.com/ziul-bio/lncov1_Transcriptome_Analysis/blob/main/scripts/run_kallisto_pipeline.sh), as simple as 1 2 3, just run the code bellow. 
+For easy reproducibility of our work, I created the file [run_kallisto_pipeline.sh](https://github.com/ziul-bio/lncov1_Transcriptome_Analysis/blob/main/scripts/run_kallisto_pipeline.sh), as simple as 1 2 3, just run the code bellow. 
 
-Note: -experiment is the experiment id of one of the studies used in this analysis. With the following code, the data will be downloaded and the quantification with kallisto will be performed. 
+Note: The argument -experiment is the experiment ID of one of the studies we used in this analysis. With the following code, the data will be downloaded and the quantification with kallisto will be performed. 
 
->>> git clone git@github.com:ziul-bio/lncov1_Transcriptome_Analysis.git
->>> bash run_kallisto_pipeline.sh -experiment GSE120561
+```bash
+git clone git@github.com:ziul-bio/lncov1_Transcriptome_Analysis.git  
 
-Note: make sure you have kallisto and curl install before procede. 
+bash run_kallisto_pipeline.sh -experiment GSE120561
+```
 
 
+Note: make sure you have Kallisto and curl installed before proceeding. 
+
+
+With the previous code finished, the quantification files will be inside of the experiment ID folder. To run sleuth and reproduce the figures as we did it, just open the Rmd file in Rstudio inside the experiment and run it.
+
+Make sure to install all the libraries required.
 
 
 ---
