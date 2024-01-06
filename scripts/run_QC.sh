@@ -1,7 +1,6 @@
 ﻿#!/bin/bash
 set -o errexit
 
-
 # how to run this script 
 # bash scripts/run_QC.sh -experiment PRJNA996350
 
@@ -33,7 +32,7 @@ if [ "$experiment" = "GSE120561" ]; then
     mkdir -p experiments/GSE93028/QC
     echo "QC check GSE120561"
     fastqc -t 32 experiments/${experiment}/rawFastq/*.fastq.gz -o experiments/${experiment}/QC/
-    multiqc experiments/${experiment}/QC/ -o experiments/${experiment}/QC/
+    #multiqc experiments/${experiment}/QC/ -o experiments/${experiment}/QC/
 
 
 elif [ "$experiment" = "GSE93028" ]; then
@@ -41,7 +40,7 @@ elif [ "$experiment" = "GSE93028" ]; then
     mkdir -p experiments/GSE93028/QC
     echo "QC check GSE93028"
     fastqc -t 32 experiments/${experiment}/rawFastq/*.fastq.gz -o experiments/${experiment}/QC/
-    multiqc experiments/${experiment}/QC/ -o experiments/${experiment}/QC/
+    #multiqc experiments/${experiment}/QC/ -o experiments/${experiment}/QC/
 
 
 elif [ "$experiment" = "PRJNA996350" ]; then
@@ -49,7 +48,7 @@ elif [ "$experiment" = "PRJNA996350" ]; then
     mkdir -p experiments/PRJNA996350/QC
     echo "QC check PRJNA996350"
     fastqc -t 32 experiments/${experiment}/rawFastq/*.fastq.gz -o experiments/${experiment}/QC/
-    multiqc experiments/${experiment}/QC/ -o experiments/${experiment}/QC/
+    #multiqc experiments/${experiment}/QC/ -o experiments/${experiment}/QC/
 
    
 fi
