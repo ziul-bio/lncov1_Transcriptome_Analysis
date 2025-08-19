@@ -26,18 +26,17 @@ fi
 
 
 
-# Run the QC pipeline for the specified experiment
+# Run the pipeline for the specified experiment
 if [ "$experiment" = "GSE120561" ]; then
 # Sample - GSE120561 (queen, queenless-worker and worker)
     echo "Running Analysis for GSE120561"
     echo " "
     echo "Doanload the data"
-    #bash scripts/download_experiments.sh -experiment GSE120561
+    bash scripts/download_experiments.sh -experiment GSE120561
     echo " "
     echo "Running quantification with kallisto"
     bash scripts/quant.sh -experiment GSE120561
    
-
 
 elif [ "$experiment" = "GSE93028" ]; then
 # sample experiment id GSE93028 (lncRNA-miRNA-mRNA and reproductive regulation in honey bees)
