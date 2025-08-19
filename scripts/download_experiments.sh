@@ -1,5 +1,9 @@
 ﻿#!/bin/bash
 
+################## Usage ###############
+# I used explore SRA to create the downloadable links.
+# bash scripts/download_experiments.sh -experiment PRJNA996350
+
 # Define a list of valid experiment IDs
 valid_experiments=("GSE120561" "GSE93028" "PRJNA996350")
 
@@ -103,7 +107,7 @@ elif [ "$experiment" = "GSE93028" ]; then
     # tissue: ovaries
     # molecule subtype: mRNA including lncRNA
     # Extracted molecule	total RNA
-    # limk: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE119256
+    # link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE119256
 
     curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR777/009/SRR7770429/SRR7770429_1.fastq.gz -o experiments/GSE93028/rawFastq/SRR7770429_W01_1.fastq.gz
     curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR777/009/SRR7770429/SRR7770429_2.fastq.gz -o experiments/GSE93028/rawFastq/SRR7770429_W01_2.fastq.gz
