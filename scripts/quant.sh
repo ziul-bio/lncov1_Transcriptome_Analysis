@@ -11,6 +11,7 @@ valid_experiments=("GSE120561" "GSE93028" "PRJNA996350")
 experimentID=$2
 is_valid_experiment=false
 
+
 # Check if the provided experiment ID is in the valid experiments list
 for valid_experiment in "${valid_experiments[@]}"; do
     if [ "$experimentID" = "$valid_experiment" ]; then
@@ -18,6 +19,7 @@ for valid_experiment in "${valid_experiments[@]}"; do
         break
     fi
 done
+
 
 # If the experiment ID is not valid, exit the script
 if [ "$is_valid_experiment" = false ]; then
@@ -30,44 +32,44 @@ fi
 
 # Define the paths
 KALLISTO_INDEX=data/kallisto_index/index_trans
-SEQ_DIR=experiments/${experimentID}/rawFastq
-OUT_DIR=experiments/${experimentID}/kallisto/quant
+SEQ_DIR=data/${experimentID}/rawFastq
+OUT_DIR=data/${experimentID}/kallisto/quant
 
 mkdir -p ${OUT_DIR}
 
 
 
 # Define the file path
-FILE="data/kallisto_index/index_trans"
+FILE="data/kallisto_index/index_trans_AMel"
 
 # Check if the index does not exist
 if [ ! -f "$FILE" ]; then
     echo "Index file does NOT exist. Running kallisto index..."
-    kallisto index -i ${KALLISTO_INDEX} data/all_transcrits.fasta
+    kallisto index -i ${KALLISTO_INDEX} data/transcripts/AMel_all_transcrits.fasta
 else
     echo "Index file found. Running kallisto index..."
 fi
 
 
 
-if [ "$experimentID" = "GSE120561" ]; then
 # Sample - GSE120561 (queen, queenless-worker and worker)
+if [ "$experimentID" = "GSE120561" ]; then
 
 	for SAMPLE in W1 W2 AW1 AW2 Q1 Q2;
 	do
 		time kallisto quant -t 24 --single --fragment-length=49 --sd=1 -b 1000 -i ${KALLISTO_INDEX} -o ${OUT_DIR}/"$SAMPLE" ${SEQ_DIR}/*_"$SAMPLE"*.fastq.gz
 	done
 	
-elif [ "$experimentID" = "GSE93028" ]; then
 # sample experiment id GSE93028 (lncRNA-miRNA-mRNA and reproductive regulation in honey bees)
+elif [ "$experimentID" = "GSE93028" ]; then
 
 	for SAMPLE in V01 V02 V03 Q01 Q02 Q03 C01 C02 C03 R01 R02 R03 W01 W02 W03;
 	do
 		time kallisto quant -t 24 -b 1000 --rf-stranded -i ${KALLISTO_INDEX} -o ${OUT_DIR}/"$SAMPLE" ${SEQ_DIR}/*_"$SAMPLE"_1.fastq.gz ${SEQ_DIR}/*_"$SAMPLE"_2.fastq.gz
 	done
 	
-elif [ "$experimentID" = "PRJNA996350" ]; then
 # sample experiment id PRJNA996350 (the transcriptome changes in honey bee larvae after inhibiting AmKr-h1 expression.)
+elif [ "$experimentID" = "PRJNA996350" ]; then
 	
 	for SAMPLE in con1 con2 con3 RNAi1 RNAi2 RNAi3;
 	do
